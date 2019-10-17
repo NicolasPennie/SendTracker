@@ -1,5 +1,5 @@
 {
-  "name": "create-next-example-app",
+  "name": "send-tracker",
   "scripts": {
     "dev": "next",
     "build": "next build",
