@@ -1,6 +1,6 @@
 import React from 'react';
-import Link from 'next/link'
-import Head from 'next/head'
+import Head from 'next/head';
+import { Container, Typography } from '@material-ui/core';
 
 export default function({ children }) {
   return (
@@ -19,7 +19,13 @@ export default function({ children }) {
 
       {children}
 
-      <footer>Nicolas Pennie &copy; 2019</footer>
+      <footer>
+        <Container maxWidth="sm">
+          <Typography variant="caption" align="center">
+            Nicolas Pennie &copy; 2019
+          </Typography>
+        </Container>
+      </footer>
     </div>
   );  
 }
