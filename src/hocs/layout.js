@@ -1,31 +1,54 @@
 import React from 'react';
 import Head from 'next/head';
-import { Container, Typography } from '@material-ui/core';
+import styled from 'styled-components';
 
-export default function({ children }) {
+const AppContainer = styled.div`
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-template-columns: 20em auto 20em;
+  grid-template-rows: 10% auto 5%;
+`
+
+const Title = styled.div`
+  grid-column-start: 2;
+  grid-row-start: 1;
+  margin: 2em;
+`
+
+const Content = styled.div`
+  grid-column-start: 2;
+  grid-row-start: 2;
+  border: 0.5em solid;
+  border-radius: 1em;
+`
+
+const Footer = styled.div`
+  grid-column-start: 2;
+  grid-row-start: 3;
+  margin: 1em;
+`
+
+export default function({ title, content, footer }) {
   return (
-    <div>
+    <AppContainer>
       <Head>
         <title>SendTracker</title>
         <meta charSet='utf-8' />
         <meta name='viewport' content='initial-scale=1.0, width=device-width' />
       </Head>
-      
-      <header>
-        <nav>
-          {/* Future links go here */}
-        </nav>
-      </header>
 
-      {children}
+      <Title>
+        {title}
+      </Title>
 
-      <footer>
-        <Container maxWidth="sm">
-          <Typography variant="caption" align="center">
-            Nicolas Pennie &copy; 2019
-          </Typography>
-        </Container>
-      </footer>
-    </div>
+      <Content>
+        {content}
+      </Content>
+
+      <Footer>
+        {footer}
+      </Footer>
+    </AppContainer>
   );  
 }
