@@ -1,35 +1,43 @@
 import React from 'react';
 import Head from 'next/head';
-import styled from 'styled-components';
+import AppBar from '@material-ui/core/AppBar';
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles, styled } from '@material-ui/core/styles';
 
-const AppContainer = styled.div`
-  height: 100vh;
-  width: 100vw;
-  display: grid;
-  grid-template-columns: 20em auto 20em;
-  grid-template-rows: 10% auto 5%;
-`
+const AppContainer = styled(Box)({
+  width: '100vw',
+  height: '100vh'
+})
 
-const Title = styled.div`
-  grid-column-start: 2;
-  grid-row-start: 1;
-  margin: 2em;
-`
+const AppFooter = styled(Box)({
+  position: 'absolute',
+  bottom: 0
+})
 
-const Content = styled.div`
-  grid-column-start: 2;
-  grid-row-start: 2;
-  border: 0.5em solid;
-  border-radius: 1em;
-`
+const useStyles = makeStyles(theme => ({
+  appbar: {
+    padding: theme.spacing(1),
+    paddingLeft: theme.spacing(4),
+    paddingRight: theme.spacing(4)
+  },
+  appbarUser: {
+    float: 'right'
+  },
+  appFooter: {
+    padding: theme.spacing(1),
+    paddingLeft: theme.spacing(4),
+    paddingRight: theme.spacing(4)
+  }
+}));
 
-const Footer = styled.div`
-  grid-column-start: 2;
-  grid-row-start: 3;
-  margin: 1em;
-`
 
-export default function({ title, content, footer }) {
+export default function() {
+
+  const classes = useStyles();
+
   return (
     <AppContainer>
       <Head>
@@ -38,17 +46,22 @@ export default function({ title, content, footer }) {
         <meta name='viewport' content='initial-scale=1.0, width=device-width' />
       </Head>
 
-      <Title>
-        {title}
-      </Title>
+      <AppBar className={classes.appbar} position="relative">
+        <Grid container spacing={2} justify="space-between">
+          <Grid item sm={1}>
+            <Typography component="span" variant="h5" align="left">SendTracker</Typography>
+          </Grid>
+          <Grid item sm={1}>
+            <Button className={classes.appbarUser} variant="text" color="inherit">Login</Button>
+          </Grid>
+        </Grid>
+      </AppBar>
 
-      <Content>
-        {content}
-      </Content>
-
-      <Footer>
-        {footer}
-      </Footer>
+      <AppFooter className={classes.appFooter}>
+        <Typography variant="caption" align="center">
+          Nicolas Pennie &copy; 2019
+        </Typography>
+      </AppFooter>
     </AppContainer>
   );  
 }
