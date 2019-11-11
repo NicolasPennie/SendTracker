@@ -26,15 +26,20 @@ const useStyles = makeStyles(theme => ({
   appbarUser: {
     float: 'right'
   },
+  appContent: {
+    paddingTop: theme.spacing(4),
+    paddingLeft: theme.spacing(8),
+    paddingRight: theme.spacing(8)
+  },
   appFooter: {
-    padding: theme.spacing(1),
+    paddingTop: theme.spacing(4),
     paddingLeft: theme.spacing(4),
-    paddingRight: theme.spacing(4)
+    paddingRight: theme.spacing(4),
+    paddingBottom: theme.spacing(1),
   }
 }));
 
-
-export default function() {
+export default function({ children }) {
 
   const classes = useStyles();
 
@@ -56,6 +61,10 @@ export default function() {
           </Grid>
         </Grid>
       </AppBar>
+
+      <Box className={classes.appContent}>
+        {children}
+      </Box>
 
       <AppFooter className={classes.appFooter}>
         <Typography variant="caption" align="center">
