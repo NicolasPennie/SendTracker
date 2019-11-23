@@ -1,9 +1,12 @@
 import React from 'react';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import { styled, makeStyles } from '@material-ui/core/styles';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import { makeStyles } from '@material-ui/core/styles';
 
 /* TODO: Replace with TS Enum after migration */
 const SPORT = 'Sport';
@@ -53,33 +56,11 @@ const useStyles = makeStyles(theme => {
             paddingBottom: theme.spacing(1)
         },
         sendBox: {
-            paddingTop: theme.spacing(2),
-            paddingBottom: theme.spacing(2)
-        },
-        sendItem: {
-            marginLeft: theme.spacing(4),
-            marginRight: theme.spacing(4),
-            padding: theme.spacing(1)
+            marginTop: theme.spacing(2),
+            marginBottom: theme.spacing(2)
         }
     });
 });
-
-const Send = ({ send }) => {
-    const classes = useStyles();
-
-    return (
-        <Grid item>
-            <Paper className={classes.sendItem}>
-                <Typography variant="body1" align="left">
-                    {send.name}
-                </Typography>
-                <Typography variant="body2" align="left">
-                    {send.grade}
-                </Typography>
-            </Paper>
-        </Grid>
-    );
-};
 
 export default () => {
     const classes = useStyles();
@@ -90,14 +71,28 @@ export default () => {
                 My Sends
             </Typography>
             <Paper className={classes.sendBox}>
-                <Grid container spacing={2} direction="column">
-
-                    { sends.map(s => (<Send send={s} />)) }
-                    
-                    <Grid item className={classes.sendItem}>
-                        <Button variant="contained" color="primary">Add</Button>
-                    </Grid>
-                </Grid>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Name</TableCell>
+                            <TableCell align="right">Type</TableCell>
+                            <TableCell align="right">Grade</TableCell>
+                            <TableCell align="right">Style</TableCell>
+                            <TableCell align="right">Location</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {sends.map(s => (
+                            <TableRow key={`${s.name}-${s.location}`}>
+                                <TableCell component="th" scope="row">{s.name}</TableCell>
+                                <TableCell align="right">{s.type}</TableCell>
+                                <TableCell align="right">{s.grade}</TableCell>
+                                <TableCell align="right">{s.style}</TableCell>
+                                <TableCell align="right">{s.location}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
             </Paper>
         </React.Fragment>
     );
