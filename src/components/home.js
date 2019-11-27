@@ -1,12 +1,18 @@
 import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
+import { 
+    Typography, 
+    Paper, 
+    Table, 
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    TableSortLabel,
+    makeStyles
+} from '@material-ui/core';
+
+import { stableSort, getSorting } from '../utility/sort';
 
 /* TODO: Replace with TS Enum after migration */
 const SPORT = 'Sport';
@@ -58,12 +64,60 @@ const useStyles = makeStyles(theme => {
         sendBox: {
             marginTop: theme.spacing(2),
             marginBottom: theme.spacing(2)
-        }
+        },
     });
 });
 
+const headers = [
+    { id: 'name', label: 'Name' },
+    { id: 'type', label: 'Type' },
+    { id: 'grade', label: 'Grade' },
+    { id: 'style', label: 'Style' },
+    { id: 'location', label: 'Location' }
+];
+
+function SendTableHeader(props) {
+    const { order, orderBy, onRequestSort } = props;
+
+    return (
+      <TableHead>
+        <TableRow>
+          {headers.map((header, index) => (
+            <TableCell
+              key={header.id}
+              align={index === 0 ? 'left' : 'right'}
+              sortDirection={orderBy === header.id ? order : false}
+            >
+              <TableSortLabel
+                active={orderBy === header.id}
+                direction={order}
+                onClick={() => onRequestSort(header.id)}
+              >
+                {header.label}
+              </TableSortLabel>
+            </TableCell>
+          ))}
+        </TableRow>
+      </TableHead>
+    );
+}
+
+SendTableHeader.propTypes = {
+    order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+    orderBy: PropTypes.string.isRequired,
+    onRequestSort: PropTypes.func.isRequired,
+};
+
 export default () => {
     const classes = useStyles();
+    const [order, setOrder] = React.useState('asc');
+    const [orderBy, setOrderBy] = React.useState('name');
+
+    const handleSortRequest = property => {
+        const isDesc = orderBy === property && order === 'desc';
+        setOrder(isDesc ? 'asc' : 'desc');
+        setOrderBy(property);
+    };
 
     return (
         <React.Fragment>
@@ -72,17 +126,13 @@ export default () => {
             </Typography>
             <Paper className={classes.sendBox}>
                 <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell align="right">Type</TableCell>
-                            <TableCell align="right">Grade</TableCell>
-                            <TableCell align="right">Style</TableCell>
-                            <TableCell align="right">Location</TableCell>
-                        </TableRow>
-                    </TableHead>
+                    <SendTableHeader
+                        order={order}
+                        orderBy={orderBy}
+                        onRequestSort={handleSortRequest}
+                    />
                     <TableBody>
-                        {sends.map(s => (
+                        {stableSort(sends, getSorting(order, orderBy)).map(s => (
                             <TableRow key={`${s.name}-${s.location}`}>
                                 <TableCell component="th" scope="row">{s.name}</TableCell>
                                 <TableCell align="right">{s.type}</TableCell>
