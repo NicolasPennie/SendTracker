@@ -5,12 +5,7 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles, styled } from '@material-ui/core/styles';
-
-const AppContainer = styled(Box)({
-  width: '100%',
-  height: '100%'
-})
+import { makeStyles } from '@material-ui/core/styles';
 
 const widthPadding = 4;
 const useStyles = makeStyles(theme => ({
@@ -27,9 +22,10 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: theme.spacing(widthPadding),
     paddingRight: theme.spacing(widthPadding),
     overflow: 'hidden',
+    minHeight: '88vh'
   },
   appFooter: {
-    paddingTop: theme.spacing(1),
+    paddingTop: theme.spacing(2),
     paddingLeft: theme.spacing(widthPadding),
     paddingRight: theme.spacing(widthPadding),
     paddingBottom: theme.spacing(1),
@@ -42,7 +38,7 @@ export default function(props) {
   const classes = useStyles(props);
 
   return (
-    <AppContainer>
+    <React.Fragment>
       <Head>
         <title>SendTracker</title>
         <meta charSet='utf-8' />
@@ -75,6 +71,6 @@ export default function(props) {
           </Typography>
         </Grid>
       </Grid>
-    </AppContainer>
+    </React.Fragment>
   );  
 }

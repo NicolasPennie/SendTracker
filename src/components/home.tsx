@@ -110,15 +110,18 @@ export default (props: {}) => {
                         onRequestSort={handleSortRequest}
                     />
                     <TableBody>
-                        {stableSort(sends, getSorting(order, orderBy)).map(s => (
-                            <TableRow key={`${s.name}-${s.location}`}>
-                                <TableCell component="th" scope="row">{s.name}</TableCell>
-                                <TableCell align="right">{s.type}</TableCell>
-                                <TableCell align="right">{s.grade}</TableCell>
-                                <TableCell align="right">{s.style}</TableCell>
-                                <TableCell align="right">{s.location}</TableCell>
-                            </TableRow>
-                        ))}
+                        {stableSort(sends, getSorting(order, orderBy))
+                            .slice(page * ROWS_PER_PAGE, (page + 1) * ROWS_PER_PAGE)
+                            .map(s => (
+                                <TableRow key={`${s.name}-${s.location}`}>
+                                    <TableCell component="th" scope="row">{s.name}</TableCell>
+                                    <TableCell align="right">{s.type}</TableCell>
+                                    <TableCell align="right">{s.grade}</TableCell>
+                                    <TableCell align="right">{s.style}</TableCell>
+                                    <TableCell align="right">{s.location}</TableCell>
+                                </TableRow>
+                            )
+                        )}
                     </TableBody>
                 </Table>
                 <TablePagination

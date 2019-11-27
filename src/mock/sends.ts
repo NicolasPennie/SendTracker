@@ -49,7 +49,7 @@ export const MOCK_SENDS = [
         type: TRAD,
         grade: '5.14-',
         style: REDPOINT,
-        location: 'Rocky Mountain National Park'
+        location: 'RMNP'
     },
     {
         name: 'Freerider',
