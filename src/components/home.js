@@ -13,48 +13,7 @@ import {
 } from '@material-ui/core';
 
 import { stableSort, getSorting } from '../utility/sort';
-
-/* TODO: Replace with TS Enum after migration */
-const SPORT = 'Sport';
-const TRAD = 'Trad';
-const BOULDER = 'Boulder';
-
-/* TODO: Replace with TS Enum after migration */
-const ONSIGHT = 'Onsight';
-const FLASH = 'Flash';
-const REDPOINT = 'Redpoint';
-
-/* TODO: Move to mock */
-const sends = [
-    { 
-        name: 'Pure Imagination',
-        type: SPORT,
-        grade: '5.14c',
-        style: REDPOINT,
-        location: 'Red River Gorge'
-    },
-    {
-        name: 'Your Wife',
-        type: SPORT,
-        grade: '5.11b',
-        style: FLASH,
-        location: 'Down Under'
-    },
-    {
-        name: 'The Process',
-        type: BOULDER,
-        grade: 'V16',
-        style: ONSIGHT,
-        location: 'The Buttermilks'
-    },
-    {
-        name: 'Scarface',
-        type: TRAD,
-        grade: '5.11',
-        style: REDPOINT,
-        location: 'Indian Creek'
-    }
-];
+import { MOCK_SENDS } from '../mock/sends';
 
 const useStyles = makeStyles(theme => {
     return ({
@@ -110,6 +69,7 @@ SendTableHeader.propTypes = {
 
 export default () => {
     const classes = useStyles();
+    const [sends] = React.useState(MOCK_SENDS);
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('name');
 
