@@ -8,15 +8,11 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, styled } from '@material-ui/core/styles';
 
 const AppContainer = styled(Box)({
-  width: '100vw',
-  height: '100vh'
+  width: '100%',
+  height: '100%'
 })
 
-const AppFooter = styled(Box)({
-  position: 'absolute',
-  bottom: 0
-})
-
+const widthPadding = 4;
 const useStyles = makeStyles(theme => ({
   appbar: {
     padding: theme.spacing(1),
@@ -28,14 +24,16 @@ const useStyles = makeStyles(theme => ({
   },
   appContent: {
     paddingTop: theme.spacing(4),
-    paddingLeft: theme.spacing(8),
-    paddingRight: theme.spacing(8)
+    paddingLeft: theme.spacing(widthPadding),
+    paddingRight: theme.spacing(widthPadding),
+    overflow: 'hidden',
   },
   appFooter: {
-    paddingTop: theme.spacing(4),
-    paddingLeft: theme.spacing(4),
-    paddingRight: theme.spacing(4),
+    paddingTop: theme.spacing(1),
+    paddingLeft: theme.spacing(widthPadding),
+    paddingRight: theme.spacing(widthPadding),
     paddingBottom: theme.spacing(1),
+    overflow: 'hidden',
   }
 }));
 
@@ -51,26 +49,32 @@ export default function(props) {
         <meta name='viewport' content='initial-scale=1.0, width=device-width' />
       </Head>
 
-      <AppBar className={classes.appbar} position="relative">
-        <Grid container spacing={2} justify="space-between">
-          <Grid item sm={1}>
-            <Typography component="span" variant="h5" align="left">SendTracker</Typography>
-          </Grid>
-          <Grid item sm={1}>
-            <Button className={classes.appbarUser} variant="text" color="inherit">Login</Button>
-          </Grid>
+      <Grid container direction="column">
+        <Grid item>
+          <AppBar className={classes.appbar} position="relative">
+            <Grid container spacing={2} justify="space-between">
+              <Grid item sm={1}>
+                <Typography component="span" variant="h5" align="left">SendTracker</Typography>
+              </Grid>
+              <Grid item sm={1}>
+                <Button className={classes.appbarUser} variant="text" color="inherit">Login</Button>
+              </Grid>
+            </Grid>
+          </AppBar>
         </Grid>
-      </AppBar>
 
-      <Box className={classes.appContent}>
-        {children}
-      </Box>
+        <Grid item>
+          <Box className={classes.appContent}>
+            {children}
+          </Box>
+        </Grid>
 
-      <AppFooter className={classes.appFooter}>
-        <Typography variant="caption" align="center">
-          Nicolas Pennie &copy; 2019
-        </Typography>
-      </AppFooter>
+        <Grid item className={classes.appFooter}>
+          <Typography variant="caption" align="center">
+            Nicolas Pennie &copy; 2019
+          </Typography>
+        </Grid>
+      </Grid>
     </AppContainer>
   );  
 }

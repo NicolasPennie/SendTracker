@@ -31,10 +31,59 @@ export const MOCK_SENDS = [
         location: 'The Buttermilks'
     },
     {
-        name: 'Scarface',
-        type: TRAD,
-        grade: '5.11',
+        name: 'Dreamcatcher',
+        type: SPORT,
+        grade: '5.14d',
         style: REDPOINT,
-        location: 'Indian Creek'
-    }
+        location: 'Squamish'
+    },
+    {
+        name: 'The Finnish Line',
+        type: BOULDER,
+        grade: 'V15',
+        style: REDPOINT,
+        location: 'Rocklands'
+    },
+    {
+        name: 'China Doll',
+        type: TRAD,
+        grade: '5.14-',
+        style: REDPOINT,
+        location: 'Rocky Mountain National Park'
+    },
+    {
+        name: 'Freerider',
+        type: TRAD,
+        grade: '5.12b',
+        style: FLASH,
+        location: 'Yosemite'
+    },
+    {
+        name: 'Silence',
+        type: SPORT,
+        grade: '5.15d',
+        style: REDPOINT,
+        location: 'Flatanger'
+    },
+    {
+        name: 'Rainbow Rocket',
+        type: BOULDER,
+        grade: 'V11',
+        style: ONSIGHT,
+        location: 'Fontainebleau'
+    },
+    {
+        name: 'Just Do It',
+        type: SPORT,
+        grade: '5.14c',
+        style: ONSIGHT,
+        location: 'Smith Rock'
+    },
+    {
+        name: 'Breakfast Burrito',
+        type: SPORT,
+        grade: '5.10c',
+        style: REDPOINT,
+        location: 'Red River Gorge'
+    },
 ];

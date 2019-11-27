@@ -1,5 +1,6 @@
 import React from 'react';
 import { 
+    Box,
     Typography, 
     Paper, 
     Table, 
@@ -8,7 +9,8 @@ import {
     TableHead,
     TableRow,
     TableSortLabel,
-    makeStyles
+    TablePagination,
+    makeStyles,
 } from '@material-ui/core';
 
 import { stableSort, getSorting } from '../utility/sort';
@@ -20,9 +22,17 @@ const useStyles = makeStyles(theme => {
             paddingBottom: theme.spacing(1)
         },
         sendBox: {
-            marginTop: theme.spacing(2),
-            marginBottom: theme.spacing(2)
+            margin: 'auto',
+            [theme.breakpoints.down('md')]: {
+                width: '100%'
+            },
+            [theme.breakpoints.up('md')]: {
+                width: '800px',
+            },
         },
+        table: {
+            marginTop: theme.spacing(2)
+        }
     });
 });
 
@@ -74,19 +84,25 @@ export default (props: {}) => {
     const [sends] = React.useState(MOCK_SENDS);
     const [order, setOrder] = React.useState<SortOrder>('asc');
     const [orderBy, setOrderBy] = React.useState<HeaderId>('name');
+    const [page, setPage] = React.useState(0);
+    const ROWS_PER_PAGE = 10;
 
-    const handleSortRequest = property => {
+    const handleSortRequest = (property: HeaderId) => {
         const isDesc = orderBy === property && order === 'desc';
         setOrder(isDesc ? 'asc' : 'desc');
         setOrderBy(property);
     };
 
+    const handleChangePage = (event: any, newPage: number) => {
+        setPage(newPage);
+    }
+
     return (
-        <React.Fragment>
+        <Box className={classes.sendBox}>
             <Typography className={classes.header} variant="h4" align="left">
                 My Sends
             </Typography>
-            <Paper className={classes.sendBox}>
+            <Paper className={classes.table}>
                 <Table>
                     <SendTableHeader
                         order={order}
@@ -105,7 +121,15 @@ export default (props: {}) => {
                         ))}
                     </TableBody>
                 </Table>
+                <TablePagination
+                    component="div"
+                    count={sends.length}
+                    rowsPerPage={ROWS_PER_PAGE}
+                    rowsPerPageOptions={[]}
+                    page={page}
+                    onChangePage={handleChangePage}
+                />
             </Paper>
-        </React.Fragment>
+        </Box>
     );
 };
