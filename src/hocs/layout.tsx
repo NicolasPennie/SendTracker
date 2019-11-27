@@ -39,9 +39,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function({ children }) {
-
-  const classes = useStyles();
+export default function(props) {
+  const { children } = props;
+  const classes = useStyles(props);
 
   return (
     <AppContainer>

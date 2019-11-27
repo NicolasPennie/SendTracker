@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { 
     Typography, 
     Paper, 
@@ -27,7 +26,10 @@ const useStyles = makeStyles(theme => {
     });
 });
 
-const headers = [
+type SortOrder = 'asc' | 'desc';
+type HeaderId = 'name' | 'type' | 'grade' | 'style' | 'location';
+
+const headers: { id: HeaderId, label: string }[] = [
     { id: 'name', label: 'Name' },
     { id: 'type', label: 'Type' },
     { id: 'grade', label: 'Grade' },
@@ -35,7 +37,13 @@ const headers = [
     { id: 'location', label: 'Location' }
 ];
 
-function SendTableHeader(props) {
+interface SendTableHeaderProps {
+    order: SortOrder,
+    orderBy: HeaderId,
+    onRequestSort: (id: HeaderId) => void
+}
+
+function SendTableHeader(props: SendTableHeaderProps) {
     const { order, orderBy, onRequestSort } = props;
 
     return (
@@ -61,17 +69,11 @@ function SendTableHeader(props) {
     );
 }
 
-SendTableHeader.propTypes = {
-    order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-    orderBy: PropTypes.string.isRequired,
-    onRequestSort: PropTypes.func.isRequired,
-};
-
-export default () => {
-    const classes = useStyles();
+export default (props: {}) => {
+    const classes = useStyles(props);
     const [sends] = React.useState(MOCK_SENDS);
-    const [order, setOrder] = React.useState('asc');
-    const [orderBy, setOrderBy] = React.useState('name');
+    const [order, setOrder] = React.useState<SortOrder>('asc');
+    const [orderBy, setOrderBy] = React.useState<HeaderId>('name');
 
     const handleSortRequest = property => {
         const isDesc = orderBy === property && order === 'desc';
