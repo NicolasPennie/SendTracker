@@ -7,29 +7,32 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-const widthPadding = 4;
+const padding = 4;
+const footerHeight = 8;
 const useStyles = makeStyles(theme => ({
-  appbar: {
+  shell: {
+    position: 'relative',
+    minHeight: '100%',
+  },
+  navbar: {
     padding: theme.spacing(1),
-    paddingLeft: theme.spacing(4),
-    paddingRight: theme.spacing(4)
+    paddingLeft: theme.spacing(padding),
+    paddingRight: theme.spacing(padding),
   },
-  appbarUser: {
-    float: 'right'
+  user: {
+    float: 'right',
   },
-  appContent: {
-    paddingTop: theme.spacing(4),
-    paddingLeft: theme.spacing(widthPadding),
-    paddingRight: theme.spacing(widthPadding),
+  content: {
+    padding: theme.spacing(padding),
+    paddingBottom: theme.spacing(footerHeight),
     overflow: 'hidden',
-    minHeight: '88vh'
   },
-  appFooter: {
-    paddingTop: theme.spacing(2),
-    paddingLeft: theme.spacing(widthPadding),
-    paddingRight: theme.spacing(widthPadding),
-    paddingBottom: theme.spacing(1),
-    overflow: 'hidden',
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    height: theme.spacing(footerHeight),
+    padding: theme.spacing(padding)
   }
 }));
 
@@ -45,32 +48,28 @@ export default function(props) {
         <meta name='viewport' content='initial-scale=1.0, width=device-width' />
       </Head>
 
-      <Grid container direction="column">
-        <Grid item>
-          <AppBar className={classes.appbar} position="relative">
+      <Box className={classes.shell}>
+          <AppBar className={classes.navbar} position="relative">
             <Grid container spacing={2} justify="space-between">
               <Grid item sm={1}>
                 <Typography component="span" variant="h5" align="left">SendTracker</Typography>
               </Grid>
               <Grid item sm={1}>
-                <Button className={classes.appbarUser} variant="text" color="inherit">Login</Button>
+                <Button className={classes.user} variant="text" color="inherit">Login</Button>
               </Grid>
             </Grid>
           </AppBar>
-        </Grid>
 
-        <Grid item>
-          <Box className={classes.appContent}>
+          <Box className={classes.content}>
             {children}
           </Box>
-        </Grid>
 
-        <Grid item className={classes.appFooter}>
-          <Typography variant="caption" align="center">
-            Nicolas Pennie &copy; 2019
-          </Typography>
-        </Grid>
-      </Grid>
+          <Box className={classes.footer}>
+            <Typography variant="caption" align="center">
+              Nicolas Pennie &copy; 2019
+            </Typography>
+          </Box>
+      </Box>
     </React.Fragment>
   );  
 }

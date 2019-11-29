@@ -27,6 +27,11 @@ export default class MyApp extends App {
           <CssBaseline />
           <Component {...pageProps} />
         </ThemeProvider>
+        <style jsx global>{`
+          html, body, #__next {
+            height: 100%;
+          }
+        `}</style>
       </React.Fragment>
     );
   }
