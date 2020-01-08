@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
     Box,
-    Typography, 
+    IconButton,
     Paper, 
     Table, 
     TableBody,
@@ -10,16 +10,24 @@ import {
     TableRow,
     TableSortLabel,
     TablePagination,
+    Toolbar,
+    Typography,
     makeStyles,
+    Tooltip,
 } from '@material-ui/core';
+import { FilterListRounded as FilterIcon } from '@material-ui/icons';
 
-import { stableSort, getSorting } from '../utility/sort';
+import { stableSort, getSorting, SortOrder } from '../utility/sort';
 import { MOCK_SENDS } from '../mock/sends';
 
 const useStyles = makeStyles(theme => {
     return ({
         header: {
-            paddingBottom: theme.spacing(1)
+            paddingBottom: theme.spacing(1),
+        },
+        filterIcon: {
+            position: 'absolute',
+            right: theme.spacing(1),
         },
         sendBox: {
             margin: 'auto',
@@ -36,7 +44,6 @@ const useStyles = makeStyles(theme => {
     });
 });
 
-type SortOrder = 'asc' | 'desc';
 type HeaderId = 'name' | 'type' | 'grade' | 'style' | 'location';
 
 const headers: { id: HeaderId, label: string }[] = [
@@ -57,25 +64,26 @@ function SendTableHeader(props: SendTableHeaderProps) {
     const { order, orderBy, onRequestSort } = props;
 
     return (
-      <TableHead>
-        <TableRow>
-          {headers.map((header, index) => (
-            <TableCell
-              key={header.id}
-              align={index === 0 ? 'left' : 'right'}
-              sortDirection={orderBy === header.id ? order : false}
-            >
-              <TableSortLabel
-                active={orderBy === header.id}
-                direction={order}
-                onClick={() => onRequestSort(header.id)}
-              >
-                {header.label}
-              </TableSortLabel>
-            </TableCell>
-          ))}
-        </TableRow>
-      </TableHead>
+    
+        <TableHead>
+            <TableRow>
+                {headers.map((header, index) => (
+                    <TableCell
+                    key={header.id}
+                    align={index === 0 ? 'left' : 'right'}
+                    sortDirection={orderBy === header.id ? order : false}
+                    >
+                    <TableSortLabel
+                        active={orderBy === header.id}
+                        direction={order}
+                        onClick={() => onRequestSort(header.id)}
+                    >
+                        {header.label}
+                    </TableSortLabel>
+                    </TableCell>
+                ))}
+            </TableRow>
+        </TableHead>
     );
 }
 
@@ -103,6 +111,13 @@ export default (props: {}) => {
                 My Sends
             </Typography>
             <Paper className={classes.table}>
+                <Toolbar>
+                    <Tooltip className={classes.filterIcon} title="Filter Items">
+                        <IconButton aria-label="filter">
+                            <FilterIcon/>
+                        </IconButton>
+                    </Tooltip>
+                </Toolbar>
                 <Table>
                     <SendTableHeader
                         order={order}
