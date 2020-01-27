@@ -1,89 +1,84 @@
-/* TODO: Replace with TS Enum after migration */
-const SPORT = 'Sport';
-const TRAD = 'Trad';
-const BOULDER = 'Boulder';
+import { Style, TickType, Send } from '../models/send';
 
-/* TODO: Replace with TS Enum after migration */
-const ONSIGHT = 'Onsight';
-const FLASH = 'Flash';
-const REDPOINT = 'Redpoint';
+const { BOULDER, SPORT, TRAD } = Style;
+const { ONSIGHT, FLASH, REDPOINT } = TickType;
 
-export const MOCK_SENDS = [
+export const MOCK_SENDS: Send[] = [
     {
         name: 'Pure Imagination',
-        type: SPORT,
+        style: SPORT,
         grade: '5.14c',
-        style: REDPOINT,
+        tickType: REDPOINT,
         location: 'Red River Gorge'
     },
     {
         name: 'Your Wife',
-        type: SPORT,
+        style: SPORT,
         grade: '5.11b',
-        style: FLASH,
+        tickType: FLASH,
         location: 'Down Under'
     },
     {
         name: 'The Process',
-        type: BOULDER,
+        style: BOULDER,
         grade: 'V16',
-        style: ONSIGHT,
+        tickType: ONSIGHT,
         location: 'The Buttermilks'
     },
     {
         name: 'Dreamcatcher',
-        type: SPORT,
+        style: SPORT,
         grade: '5.14d',
-        style: REDPOINT,
+        tickType: REDPOINT,
         location: 'Squamish'
     },
     {
         name: 'The Finnish Line',
-        type: BOULDER,
+        style: BOULDER,
         grade: 'V15',
-        style: REDPOINT,
+        tickType: REDPOINT,
         location: 'Rocklands'
     },
     {
         name: 'China Doll',
-        type: TRAD,
+        style: TRAD,
         grade: '5.14-',
-        style: REDPOINT,
+        tickType: REDPOINT,
         location: 'RMNP'
     },
     {
         name: 'Freerider',
-        type: TRAD,
+        style: TRAD,
         grade: '5.12b',
-        style: FLASH,
+        tickType: FLASH,
         location: 'Yosemite'
     },
     {
         name: 'Silence',
-        type: SPORT,
+        style: SPORT,
         grade: '5.15d',
-        style: REDPOINT,
+        tickType: REDPOINT,
         location: 'Flatanger'
     },
     {
         name: 'Rainbow Rocket',
-        type: BOULDER,
+        style: BOULDER,
         grade: 'V11',
-        style: ONSIGHT,
+        tickType: ONSIGHT,
         location: 'Fontainebleau'
     },
     {
         name: 'Just Do It',
-        type: SPORT,
+        style: SPORT,
         grade: '5.14c',
-        style: ONSIGHT,
+        tickType: ONSIGHT,
         location: 'Smith Rock'
     },
     {
         name: 'Breakfast Burrito',
-        type: SPORT,
+        style: SPORT,
         grade: '5.10c',
-        style: REDPOINT,
+        tickType: REDPOINT,
         location: 'Red River Gorge'
     },
 ];
