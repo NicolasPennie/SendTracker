@@ -9,7 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const padding = 4;
 const footerHeight = 8;
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   shell: {
     position: 'relative',
     minHeight: '100%',
@@ -32,44 +32,44 @@ const useStyles = makeStyles(theme => ({
     bottom: 0,
     width: '100%',
     height: theme.spacing(footerHeight),
-    padding: theme.spacing(padding)
-  }
+    padding: theme.spacing(padding),
+  },
 }));
 
-export default function(props) {
+export default function (props) {
   const { children } = props;
   const classes = useStyles(props);
 
   return (
-    <React.Fragment>
+    <>
       <Head>
         <title>SendTracker</title>
-        <meta charSet='utf-8' />
-        <meta name='viewport' content='initial-scale=1.0, width=device-width' />
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
 
       <Box className={classes.shell}>
-          <AppBar className={classes.navbar} position="relative">
-            <Grid container spacing={2} justify="space-between">
-              <Grid item sm={1}>
-                <Typography component="span" variant="h5" align="left">SendTracker</Typography>
-              </Grid>
-              <Grid item sm={1}>
-                <Button className={classes.user} variant="text" color="inherit">Login</Button>
-              </Grid>
+        <AppBar className={classes.navbar} position="relative">
+          <Grid container spacing={2} justify="space-between">
+            <Grid item sm={1}>
+              <Typography component="span" variant="h5" align="left">SendTracker</Typography>
             </Grid>
-          </AppBar>
+            <Grid item sm={1}>
+              <Button className={classes.user} variant="text" color="inherit">Login</Button>
+            </Grid>
+          </Grid>
+        </AppBar>
 
-          <Box className={classes.content}>
-            {children}
-          </Box>
+        <Box className={classes.content}>
+          {children}
+        </Box>
 
-          <Box className={classes.footer}>
-            <Typography variant="caption" align="center">
+        <Box className={classes.footer}>
+          <Typography variant="caption" align="center">
               Nicolas Pennie &copy; 2019
-            </Typography>
-          </Box>
+          </Typography>
+        </Box>
       </Box>
-    </React.Fragment>
-  );  
+    </>
+  );
 }

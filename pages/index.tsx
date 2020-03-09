@@ -1,12 +1,11 @@
-import React from 'react'
-import Layout from '../src/hocs/layout';
-import Home from '../src/components/home';
+import React from 'react';
+import Layout from '../src/hocs/Layout';
+import Home from '../src/components/Home';
 
-export default function() {
-  return (  
+export default function () {
+  return (
     <Layout>
-      <Home/>
+      <Home />
     </Layout>
   );
 }
-

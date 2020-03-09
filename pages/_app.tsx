@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import App from 'next/app';
 import Head from 'next/head';
@@ -18,7 +19,7 @@ export default class MyApp extends App {
     const { Component, pageProps } = this.props;
 
     return (
-      <React.Fragment>
+      <>
         <Head>
           <title>SendTracker</title>
         </Head>
@@ -27,12 +28,16 @@ export default class MyApp extends App {
           <CssBaseline />
           <Component {...pageProps} />
         </ThemeProvider>
-        <style jsx global>{`
-          html, body, #__next {
+        <style jsx global>
+          {`
+          html,
+          body,
+          #__next {
             height: 100%;
           }
-        `}</style>
-      </React.Fragment>
+        `}
+        </style>
+      </>
     );
   }
 }
