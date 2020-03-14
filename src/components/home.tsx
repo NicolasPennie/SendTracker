@@ -3,48 +3,28 @@ import {
   Box,
   IconButton,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  TablePagination,
   Toolbar,
   Typography,
   makeStyles,
   Tooltip,
-  FormControl,
-  Select,
-  InputLabel,
-  MenuItem,
-  TextField,
-  OutlinedInput,
   Grow,
 } from '@material-ui/core';
 import { FilterListRounded as FilterIcon } from '@material-ui/icons';
 
-import SendTable from './SendTable/SendTable';
-import { stableSort, getSorting, SortOrder } from './SendTable/sort';
-import { Style } from '../models/send';
-import { MOCK_SENDS } from '../mock/sends';
+import SendTable from './SendTable';
+import SendFilter from './SendFilter';
+import MOCK_SENDS from '../mock/sends';
 
 const useStyles = makeStyles((theme) => ({
   header: {
     paddingBottom: theme.spacing(1),
   },
-  filterToolbar: {
-    height: 80,
-  },
-  filterForm: {
-    '& > *': {
-      margin: theme.spacing(1),
-      width: 120,
-    },
-  },
   filterIcon: {
     position: 'absolute',
     right: theme.spacing(1),
+  },
+  filterToolbar: {
+    height: 80,
   },
   sendBox: {
     margin: 'auto',
@@ -59,8 +39,6 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(2),
   },
 }));
-
-interface SendFilterProps {}
 
 export default (props: {}) => {
   const classes = useStyles(props);
