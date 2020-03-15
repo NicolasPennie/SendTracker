@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function (props) {
+export default function (props: { children: JSX.Element }) {
   const { children } = props;
   const classes = useStyles(props);
 
