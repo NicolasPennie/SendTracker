@@ -10,12 +10,10 @@ export enum TickType {
   REDPOINT = 'Redpoint'
 }
 
-export interface Grade {}
-
 export interface Send {
   name: string;
   style: Style;
-  grade: Grade;
+  grade: string;
   tickType: TickType;
   location: string;
 }

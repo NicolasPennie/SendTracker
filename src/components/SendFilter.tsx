@@ -9,29 +9,35 @@ import {
   OutlinedInput,
   Grid,
 } from '@material-ui/core';
-import { Style } from '../models/send';
+import { Style, TickType } from '../models/send';
+import { DEFAULT_FILTER_OPTIONS, FilterOptions } from '../models/filter';
 
-export default function SendFilter() {
-  const [filter, setFilter] = React.useState({
-    name: '',
-    style: 'all',
-    grade: '',
-    tickType: 'all',
-    location: '',
-  });
+export interface SendFilterProps {
+  onFilterChange: (options: FilterOptions) => void;
+}
 
-  const inputLabel = React.useRef(null);
-  const [labelWidth, setLabelWidth] = React.useState(40);
+export default function SendFilter(props: SendFilterProps) {
+  const { onFilterChange } = props;
+  const [options, setOptions] = React.useState(DEFAULT_FILTER_OPTIONS);
+
+  const styleInputLabel = React.useRef(null);
+  const tickTypeInputLabel = React.useRef(null);
+  const [styleLabelWidth, setStyleLabelWidth] = React.useState(40);
+  const [tickTypeLabelWidth, setTickTypeLabelWidth] = React.useState(60);
   React.useEffect(() => {
-    setLabelWidth(inputLabel.current.offsetWidth);
+    setStyleLabelWidth(styleInputLabel.current.offsetWidth);
+    setTickTypeLabelWidth(tickTypeInputLabel.current.offsetWidth);
   }, []);
 
   type inputChangeEvent = React.ChangeEvent<({ name: string, value: string })>;
   const handleFilterChange = (event: inputChangeEvent) => {
-    setFilter({
-      ...filter,
+    const newOptions = {
+      ...options,
       [event.target.name]: event.target.value,
-    });
+    };
+
+    setOptions(newOptions);
+    onFilterChange(newOptions);
   };
 
   return (
@@ -43,7 +49,7 @@ export default function SendFilter() {
             label="Name"
             name="name"
             variant="outlined"
-            value={filter.name}
+            value={options.name}
             InputLabelProps={{ shrink: true }}
             onChange={handleFilterChange}
           />
@@ -51,19 +57,19 @@ export default function SendFilter() {
 
         <Grid item xs>
           <FormControl fullWidth variant="outlined">
-            <InputLabel shrink ref={inputLabel} htmlFor="style-filter">
+            <InputLabel shrink ref={styleInputLabel} htmlFor="style-filter">
               <Typography>Style</Typography>
             </InputLabel>
             <Select
               id="style-filter"
-              value={filter.style}
+              value={options.style}
               onChange={handleFilterChange}
               input={(
                 <OutlinedInput
                   notched
                   id="style-filter"
                   name="style"
-                  labelWidth={labelWidth}
+                  labelWidth={styleLabelWidth}
                 />
             )}
             >
@@ -80,7 +86,7 @@ export default function SendFilter() {
             label="Grade"
             name="grade"
             variant="outlined"
-            value={filter.grade}
+            value={options.grade}
             InputLabelProps={{ shrink: true }}
             onChange={handleFilterChange}
           />
@@ -88,26 +94,26 @@ export default function SendFilter() {
 
         <Grid item xs>
           <FormControl fullWidth variant="outlined">
-            <InputLabel shrink ref={inputLabel} htmlFor="tickType-filter">
-              <Typography>Style</Typography>
+            <InputLabel shrink ref={tickTypeInputLabel} htmlFor="tickType-filter">
+              <Typography>Tick Type</Typography>
             </InputLabel>
             <Select
               id="tickType-filter"
-              value={filter.tickType}
+              value={options.tickType}
               onChange={handleFilterChange}
               input={(
                 <OutlinedInput
                   notched
                   id="tickType-filter"
                   name="tickType"
-                  labelWidth={labelWidth}
+                  labelWidth={tickTypeLabelWidth}
                 />
             )}
             >
               <MenuItem value="all">All</MenuItem>
-              <MenuItem value={Style.BOULDER}>{Style.BOULDER}</MenuItem>
-              <MenuItem value={Style.SPORT}>{Style.SPORT}</MenuItem>
-              <MenuItem value={Style.TRAD}>{Style.TRAD}</MenuItem>
+              <MenuItem value={TickType.ONSIGHT}>{TickType.ONSIGHT}</MenuItem>
+              <MenuItem value={TickType.FLASH}>{TickType.FLASH}</MenuItem>
+              <MenuItem value={TickType.REDPOINT}>{TickType.REDPOINT}</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -117,7 +123,7 @@ export default function SendFilter() {
             label="Location"
             name="location"
             variant="outlined"
-            value={filter.location}
+            value={options.location}
             InputLabelProps={{ shrink: true }}
             onChange={handleFilterChange}
           />

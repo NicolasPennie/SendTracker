@@ -8,8 +8,9 @@ import {
 import SendTable from './SendTable';
 import SendToolbar from './SendToolbar';
 import MOCK_SENDS from '../mock/sends';
+import { Filter, FilterOptions } from '../models/filter';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   header: {
     paddingBottom: theme.spacing(1),
   },
@@ -30,6 +31,12 @@ const useStyles = makeStyles((theme) => ({
 export default (props: {}) => {
   const classes = useStyles(props);
   const [sends] = React.useState(MOCK_SENDS);
+  const [filteredSends, setFilteredSends] = React.useState(MOCK_SENDS);
+
+  const handleFilterChange = (options: FilterOptions) => {
+    const filter = new Filter(options);
+    setFilteredSends(filter.apply(sends));
+  };
 
   return (
     <Box className={classes.sendBox}>
@@ -37,8 +44,8 @@ export default (props: {}) => {
         My Sends
       </Typography>
       <Paper className={classes.table}>
-        <SendToolbar />
-        <SendTable sends={sends} />
+        <SendToolbar onFilterChange={handleFilterChange} />
+        <SendTable sends={filteredSends} />
       </Paper>
     </Box>
   );

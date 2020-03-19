@@ -28,3 +28,8 @@ rules:
   no-multiple-empty-lines:
     - error
     - max: 1
+  lines-between-class-members: off
+  no-restricted-syntax: off
+  arrow-parens:
+    - error
+    - as-needed

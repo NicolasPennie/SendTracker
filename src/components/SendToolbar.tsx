@@ -8,8 +8,9 @@ import {
 } from '@material-ui/core';
 import { FilterListRounded as FilterIcon } from '@material-ui/icons';
 import SendFilter from './SendFilter';
+import { FilterOptions } from '../models/filter';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   toolbar: {
     paddingTop: theme.spacing(2),
     paddingLeft: theme.spacing(2),
@@ -20,7 +21,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SendToolbar(props: {}) {
+export interface SendToolbarProps {
+  onFilterChange: (options: FilterOptions) => void;
+}
+
+export default function SendToolbar(props: SendToolbarProps) {
+  const { onFilterChange } = props;
   const classes = useStyles(props);
   const [filterVisible, setFilterVisible] = React.useState(false);
 
@@ -47,7 +53,7 @@ export default function SendToolbar(props: {}) {
 
         {filterVisible && (
           <Grid item>
-            <SendFilter />
+            <SendFilter onFilterChange={onFilterChange} />
           </Grid>
         )}
 

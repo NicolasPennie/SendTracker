@@ -44,7 +44,7 @@ export default function SendTable(props: SendTableProps) {
         <TableBody>
           {stableSort(sends, getSorting(order, orderBy))
             .slice(page * ROWS_PER_PAGE, (page + 1) * ROWS_PER_PAGE)
-            .map((s) => (
+            .map(s => (
               <TableRow key={`${s.name}-${s.location}`}>
                 <TableCell component="th" scope="row">{s.name}</TableCell>
                 <TableCell align="right">{s.style}</TableCell>
