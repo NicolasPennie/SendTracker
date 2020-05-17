@@ -1,9 +1,3 @@
 # SendTracker
 
-NextJS application that can be deployed to ZEIT Now.
-
-## Deploying
-
-```shell
-$ now
-```
+An logging and visulization web application for serious rock climbers.

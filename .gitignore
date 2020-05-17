@@ -1,23 +1,28 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+source/client/node_modules
 
 # testing
-/coverage
+source/client/coverage
 
-# production
-/build
-/dist
-/.next
+# build outputs
+source/client/build
+source/client/dist
+source/client/.next
+source/send-service/gradle
+
+# editor configs
+source/client/.vscode
+source/send-service/.idea
 
 # misc
-.DS_Store
-.env
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+**/.DS_Store
+**/.env
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
 
 # Environment Variables
-.env
-.env.build
+source/client/.env
+source/client/.env.build
