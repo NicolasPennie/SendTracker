@@ -1,3 +1,3 @@
 # SendTracker
 
-An logging and visulization web application for serious rock climbers.
+An logging and visualization web application for serious rock climbers.
