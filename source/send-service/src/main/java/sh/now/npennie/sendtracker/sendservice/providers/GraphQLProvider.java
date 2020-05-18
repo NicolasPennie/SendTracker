@@ -1,4 +1,4 @@
-package sh.now.npennie.sendtracker.sendservice;
+package sh.now.npennie.sendtracker.sendservice.providers;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
@@ -9,8 +9,10 @@ import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import sh.now.npennie.sendtracker.sendservice.DataFetchers;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -23,6 +25,9 @@ import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 @Component
 public class GraphQLProvider {
     private GraphQL graphQL;
+
+    @Autowired
+    private DataFetchers dataFetchers;
 
     @Bean
     public GraphQL GraphQL() {
@@ -44,20 +49,10 @@ public class GraphQLProvider {
         return schemaGen.makeExecutableSchema(typeRegistry, wiring);
     }
 
-    private DataFetcher sendsDataFetcher() {
-        List<Map<String, String>> sends = Arrays.asList(
-                ImmutableMap.of("name", "November"),
-                ImmutableMap.of("name", "Sahara"),
-                ImmutableMap.of("name", "Feature Press")
-        );
-
-        return dataFetchingEnvironment -> sends;
-    }
-
     private RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
                 .type(newTypeWiring("Query")
-                        .dataFetcher("sends", sendsDataFetcher())
+                        .dataFetcher("listSends", dataFetchers.listSends())
                 )
                 .build();
     }

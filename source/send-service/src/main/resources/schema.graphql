@@ -1,7 +1,23 @@
 type Query {
-    sends: [Send]
+    listSends: [Send]
+}
+
+enum Style {
+    BOULDER,
+    SPORT,
+    TRAD
+}
+
+enum TickType {
+    ONSIGHT
+    FLASH
+    REDPOINT
 }
 
 type Send {
     name: String
+    style: Style
+    grade: String
+    tickType: TickType,
+    location: String
 }
