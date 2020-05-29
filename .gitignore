@@ -10,11 +10,17 @@ source/client/coverage
 source/client/build
 source/client/dist
 source/client/.next
-source/send-service/gradle
+source/api/**/gradle
+source/api/**/.gradle
+source/api/**/build
+source/api/**/out.yml
+
+# aws config
+source/api/**/bucket-name.txt
 
 # editor configs
 source/client/.vscode
-source/send-service/.idea
+source/api/**/.idea
 
 # misc
 **/.DS_Store
