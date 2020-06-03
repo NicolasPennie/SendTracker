@@ -13,10 +13,11 @@ source/client/.next
 source/api/**/gradle
 source/api/**/.gradle
 source/api/**/build
+source/api/**/.aws-sam
 source/api/**/out.yml
 
 # aws config
-source/api/**/bucket-name.txt
+source/api/**/samconfig.toml
 
 # editor configs
 source/client/.vscode

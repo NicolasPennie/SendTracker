@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SendTracker API
+
+Globals:
+  Function:
+    Timeout: 20
+
+Resources:
+  SendServiceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: SendService
+      Handler: sendservice.App::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Events:
+        SendService:
+          Type: Api
+          Properties:
+            Path: /send
+            Method: ANY
+
+Outputs:
+  SendServiceApi:
+    Description: "API Gateway endpoint URL for Prod stage for SendService"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  SendServiceFunction:
+    Description: "SendService Function ARN"
+    Value: !GetAtt SendServiceFunction.Arn
+  SendServiceFunctionIamRole:
+    Description: "Implicit IAM Role created for SendService"
+    Value: !GetAtt SendServiceFunctionRole.Arn
