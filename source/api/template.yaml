@@ -15,12 +15,16 @@ Resources:
       Runtime: java11
       MemorySize: 512
       Events:
-        SendService:
+        SendServiceBaseRoute:
           Type: Api
           Properties:
             Path: /send
             Method: ANY
-
+        SendServiceSubRoutes:
+          Type: Api
+          Properties:
+            Path: /send/{proxy+}
+            Method: ANY
 Outputs:
   SendServiceApi:
     Description: "API Gateway endpoint URL for Prod stage for SendService"

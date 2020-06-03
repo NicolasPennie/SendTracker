@@ -1,27 +1,50 @@
 package sendservice;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.google.gson.Gson;
 
 /**
  * Handler for requests to Lambda function.
  */
-public class App implements RequestHandler<Object, Object> {
+public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
-    public Object handleRequest(final Object input, final Context context) {
-        Map<String, String> headers = new HashMap<>();
+    private final Gson gson = new Gson();
+
+    @Override
+    public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent input,  final Context context) {
+        LambdaLogger logger = context.getLogger();
+        logger.log(gson.toJson(input));
+
+        switch (input.getHttpMethod()) {
+            case "GET":
+                return getAllSends();
+
+            default:
+                return handleUnexpectedMethod();
+        }
+    }
+
+    private APIGatewayProxyResponseEvent getAllSends() {
+        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+        HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
-        headers.put("X-Custom-Header", "application/json");
+        response.setHeaders(headers);
+        response.setBody("{ \"message\": \"Welcome to SendTracker!\" }");
+        response.setStatusCode(200);
+        response.setIsBase64Encoded(false);
+        return response;
+    }
 
-        String output = "{ \"message\": \"Welcome to SendTracker!\" }";
-        return new GatewayResponse(output, headers, 200);
+    private APIGatewayProxyResponseEvent handleUnexpectedMethod() {
+        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+        response.setStatusCode(400);
+        response.setIsBase64Encoded(false);
+        return response;
     }
 }
