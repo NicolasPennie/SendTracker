@@ -6,14 +6,100 @@ Globals:
   Function:
     Timeout: 20
 
+Parameters:
+  SendDBInstanceID:
+    Default: send-db
+    Description: Send database instance
+    Type: String
+    MinLength: '1'
+    MaxLength: '63'
+
+  SendDBName:
+    Default: send
+    Description: Send database name
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: '[a-zA-Z]([a-zA-Z0-9]+)?'
+    ConstraintDescription: Must start with a letter and contain only alphanumeric characters.
+
+  SendDBInstanceClass:
+    Default: db.t2.micro
+    Description: Database instance class
+    Type: String
+    ConstraintDescription: Must select a valid DB instance type.
+
+  SendDBAllocatedStorage:
+    Default: '20'
+    Description: The size of the database (GiB)
+    Type: Number
+    MinValue: '5'
+    MaxValue: '1024'
+    ConstraintDescription: Must be between 5 and 1024 GiB.
+
+  SendDBUsername:
+    Description: Username for Postgres database access
+    Type: String
+    MinLength: '1'
+    MaxLength: '16'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
+
+  SendDBPassword:
+    Description: Password for Postgres database access
+    Type: String
+    MinLength: '8'
+    MaxLength: '41'
+    AllowedPattern: '[a-zA-Z0-9]+'
+    ConstraintDescription: Must contain more than eight alphanumeric characters.
+
+  SendServiceSubnetId:
+    Description: VPC subnets for SendService
+    Type: AWS::EC2::Subnet::Id
+
+  DeveloperIP:
+    Description: Local IP address. VPC will be open to this IP address.
+    Type: String
+    MinLength: '7'
+    MaxLength: '18'
+    AllowedPattern: '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}'
+    ConstraintDescription: Must be an IP address in CIDR notation.
+
 Resources:
+  SendDB:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBInstanceIdentifier: !Ref SendDBInstanceID
+      DBName: !Ref SendDBName
+      DBInstanceClass: !Ref SendDBInstanceClass
+      AllocatedStorage: !Ref SendDBAllocatedStorage
+      Engine: postgres
+      EngineVersion: 11.6
+      MasterUsername: !Ref SendDBUsername
+      MasterUserPassword: !Ref SendDBPassword
+      PubliclyAccessible: true
+      VPCSecurityGroups:
+        - !GetAtt SendDBSecurityGroup.GroupId
+
   SendServiceFunction:
     Type: AWS::Serverless::Function
+    DependsOn:
+      - SendDB
     Properties:
       CodeUri: SendService
       Handler: sendservice.App::handleRequest
       Runtime: java11
       MemorySize: 512
+      VpcConfig:
+        SecurityGroupIds:
+          - !GetAtt SendServiceSecurityGroup.GroupId
+        SubnetIds:
+          - !Ref SendServiceSubnetId
+      Environment:
+        Variables:
+          DB_NAME: !Ref SendDBName
+          DB_ENDPOINT_ADDRESS: !GetAtt SendDB.Endpoint.Address
+          DB_ENDPOINT_PORT: !GetAtt SendDB.Endpoint.Port
       Events:
         SendServiceBaseRoute:
           Type: Api
@@ -25,13 +111,56 @@ Resources:
           Properties:
             Path: /send/{proxy+}
             Method: ANY
+
+  SendServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Send Service
+      GroupName: send-service-sg
+
+  SendDBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Send Database
+      GroupName: send-db-sg
+      SecurityGroupIngress:
+        - CidrIp: !Ref DeveloperIP
+          IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          Description: 'Opens DB to the local developer IP address'
+
+  SendDBSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+        IpProtocol: tcp
+        FromPort: 5432 # PostgreSQL default port
+        ToPort: 5432 # PostgreSQL default port
+        GroupId: !GetAtt SendDBSecurityGroup.GroupId
+        SourceSecurityGroupId: !GetAtt SendServiceSecurityGroup.GroupId
+        Description: 'Opens DB to the SendService Lambda function'
+
 Outputs:
-  SendServiceApi:
-    Description: "API Gateway endpoint URL for Prod stage for SendService"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  SendDB:
+    Description: "Send Database ARN"
+    Value: !Sub SendDB.Arn
+
+  SendDBEndpoint:
+    Description: "Send Database Endpoint"
+    Value: !GetAtt SendDB.Endpoint.Address
+
+  Api:
+    Description: "API Gateway ARN"
+    Value: !Ref ServerlessRestApi
+
+  SendServiceEndpoint:
+    Description: "SendService Endpoint"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/send"
+
   SendServiceFunction:
     Description: "SendService Function ARN"
     Value: !GetAtt SendServiceFunction.Arn
+
   SendServiceFunctionIamRole:
     Description: "Implicit IAM Role created for SendService"
     Value: !GetAtt SendServiceFunctionRole.Arn
