@@ -1,16 +1,20 @@
-package sendservice;
+package sendservice.providers;
 
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.secretsmanager.AWSSecretsManager;
 import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
 import com.amazonaws.services.secretsmanager.model.GetSecretValueRequest;
 import com.google.gson.Gson;
+import sendservice.models.DbCredentials;
+import sendservice.models.Send;
+import sendservice.models.Style;
+import sendservice.models.TickType;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SendProvider {
+public class PostgresSendProvider implements SendProvider {
 
     private final LambdaLogger logger;
     private final String connectionString;
@@ -21,15 +25,15 @@ public class SendProvider {
         T handleResult(ResultSet resultset) throws SQLException;
     }
 
-    public SendProvider(LambdaLogger logger) {
+    public PostgresSendProvider(LambdaLogger logger) {
         this.logger = logger;
         this.connectionString = getConnectionString();
         this.dbCredentials = getDbCredentials();
-        logger.log(gson.toJson(dbCredentials));
     }
 
     public List<Send> getAllSends() throws SQLException {
         var query = "SELECT id, name, style, grade, tick_type, location FROM send";
+
         return executeDbQuery(query, resultSet -> {
             var id = resultSet.getString("id");
             var name = resultSet.getString("name");
@@ -61,7 +65,6 @@ public class SendProvider {
                 .withSecretId(secretName);
 
         try {
-            logger.log("Trying to retrieve db secret");
             var dbSecret = client.getSecretValue(getSecretValueRequest).getSecretString();
             return gson.fromJson(dbSecret, DbCredentials.class);
         } catch (Exception e) {

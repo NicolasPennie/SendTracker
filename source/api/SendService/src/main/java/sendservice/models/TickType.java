@@ -1,4 +1,4 @@
-package sendservice;
+package sendservice.models;
 
 public enum TickType {
     ONSIGHT,

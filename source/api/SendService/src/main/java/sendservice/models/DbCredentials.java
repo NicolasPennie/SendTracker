@@ -1,4 +1,4 @@
-package sendservice;
+package sendservice.models;
 
 public class DbCredentials {
     private String username;

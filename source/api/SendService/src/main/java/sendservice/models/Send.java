@@ -1,4 +1,4 @@
-package sendservice;
+package sendservice.models;
 
 public class Send {
     private String id;

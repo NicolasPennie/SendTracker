@@ -9,6 +9,8 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
+import sendservice.providers.PostgresSendProvider;
+import sendservice.providers.SendProvider;
 
 /**
  * Handler for requests to Lambda function.
@@ -30,7 +32,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         logger = context.getLogger();
 
         if (sendProvider == null) {
-            sendProvider = new SendProvider(logger);
+            sendProvider = new PostgresSendProvider(logger);
         }
 
         switch (input.getHttpMethod()) {
@@ -55,7 +57,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         catch (Exception e) {
             logger.log("Failed to get all sends. Something unexpected occurred: " + e.getMessage());
             return handleInternalError();
-    }
+        }
     }
 
     private APIGatewayProxyResponseEvent handleJsonSuccess(String json) {
