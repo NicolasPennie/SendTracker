@@ -9,6 +9,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
+import sendservice.models.Send;
 import sendservice.providers.PostgresSendProvider;
 import sendservice.providers.SendProvider;
 
@@ -28,16 +29,25 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     }
 
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent input,  final Context context) {
+    public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent input, final Context context) {
         logger = context.getLogger();
 
         if (sendProvider == null) {
-            sendProvider = new PostgresSendProvider(logger);
+            try {
+                sendProvider = new PostgresSendProvider(logger);
+            }
+            catch (ClassNotFoundException e) {
+                logger.log("JDBC PostgreSQL driver was not found: " + e.getMessage());
+                return handleInternalError();
+            }
         }
 
         switch (input.getHttpMethod()) {
             case "GET":
                 return getAllSends();
+
+            case "POST":
+                return addSend(input);
 
             default:
                 return handleBadRequest();
@@ -56,6 +66,23 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         }
         catch (Exception e) {
             logger.log("Failed to get all sends. Something unexpected occurred: " + e.getMessage());
+            return handleInternalError();
+        }
+    }
+
+    private APIGatewayProxyResponseEvent addSend(final APIGatewayProxyRequestEvent input) {
+        try {
+            var send = gson.fromJson(input.getBody(), Send.class);
+            var id = sendProvider.addSend(send);
+            var json = String.format("{\"id\": %s }", id);
+            return handleJsonSuccess(json);
+        }
+        catch (SQLException e) {
+            logger.log("Failed to add send. Database error occurred: " + e.getMessage());
+            return handleInternalError();
+        }
+        catch (Exception e) {
+            logger.log("Failed to get add send. Something unexpected occurred: " + e.getMessage());
             return handleInternalError();
         }
     }

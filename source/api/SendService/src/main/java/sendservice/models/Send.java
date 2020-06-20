@@ -1,14 +1,14 @@
 package sendservice.models;
 
 public class Send {
-    private String id;
+    private int id;
     private String name;
     private Style style;
     private String grade;
     private TickType tickType;
     private String location;
 
-    public Send(String id, String name, Style style, String grade, TickType tickType, String location) {
+    public Send(int id, String name, Style style, String grade, TickType tickType, String location) {
         this.id = id;
         this.name = name;
         this.style = style;
@@ -17,11 +17,11 @@ public class Send {
         this.location = location;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

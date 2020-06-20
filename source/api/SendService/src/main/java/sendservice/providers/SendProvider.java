@@ -5,5 +5,7 @@ import sendservice.models.Send;
 import java.util.List;
 
 public interface SendProvider {
-    public List<Send> getAllSends() throws Exception;
+    List<Send> getAllSends() throws Exception;
+
+    int addSend(Send send) throws Exception;
 }

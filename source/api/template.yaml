@@ -141,10 +141,6 @@ Resources:
         Description: 'Opens DB to the SendService Lambda function'
 
 Outputs:
-  SendDB:
-    Description: "Send Database ARN"
-    Value: !Sub SendDB.Arn
-
   SendDBEndpoint:
     Description: "Send Database Endpoint"
     Value: !GetAtt SendDB.Endpoint.Address

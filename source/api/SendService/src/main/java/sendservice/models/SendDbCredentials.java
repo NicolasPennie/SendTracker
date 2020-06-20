@@ -1,10 +1,10 @@
 package sendservice.models;
 
-public class DbCredentials {
+public class SendDbCredentials {
     private String username;
     private String password;
 
-    public DbCredentials(String username, String password) {
+    public SendDbCredentials(String username, String password) {
         this.username = username;
         this.password = password;
     }
