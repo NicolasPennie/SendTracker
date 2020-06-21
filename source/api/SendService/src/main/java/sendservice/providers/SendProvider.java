@@ -8,4 +8,6 @@ public interface SendProvider {
     List<Send> getAllSends() throws Exception;
 
     int addSend(Send send) throws Exception;
+
+    void editSend(Send send) throws Exception;
 }

@@ -78,6 +78,26 @@ public class PostgresSendProvider implements SendProvider {
         return results.get(0);
     }
 
+    /**
+     * Edits an existing send in the database.
+     * @param send Send to update. The ID field must be populated.
+     * @throws SQLException
+     */
+    public void editSend(Send send) throws SQLException {
+        var sql = "UPDATE send " +
+                "SET (name, style, grade, tick_type, location) = (?, ?, ?, ?, ?)" +
+                "WHERE id = ?";
+
+        executeDbUpdate(sql, statement -> {
+            statement.setString(1, send.getName());
+            statement.setString(2, send.getStyle().toString());
+            statement.setString(3, send.getGrade());
+            statement.setString(4, send.getTickType().toString());
+            statement.setString(5, send.getLocation());
+            statement.setInt(6, send.getId());
+        });
+    }
+
     private String getConnectionString() {
         String dbName = System.getenv("DB_NAME");
         String dbAddress = System.getenv("DB_ENDPOINT_ADDRESS");
@@ -149,6 +169,17 @@ public class PostgresSendProvider implements SendProvider {
      * Executes a SQL statement to update the database.
      * @param sql Prepared SQL statement.
      * @param statementHandler Handles the prepared SQL statement. Used to assign values to statement parameters.
+     * @throws SQLException
+     */
+    private void executeDbUpdate(String sql, DbStatementHandler statementHandler) throws SQLException {
+        executeDbUpdate(sql, statementHandler, null);
+    }
+
+    /**
+     * Executes a SQL statement to update the database.
+     * @param sql Prepared SQL statement.
+     * @param statementHandler Handles the prepared SQL statement. Used to assign values to statement parameters.
+     * @param resultHandler Handles the resultSet that contains the statement results.
      * @return Update results as a list of T.
      * @throws SQLException
      */
@@ -166,9 +197,11 @@ public class PostgresSendProvider implements SendProvider {
             statementHandler.handleStatement(statement);
             statement.execute();
 
-            resultSet = statement.getResultSet();
-            while (resultSet.next()) {
-                results.add(resultHandler.handleResult(resultSet));
+            if (resultHandler != null) {
+                resultSet = statement.getResultSet();
+                while (resultSet.next()) {
+                    results.add(resultHandler.handleResult(resultSet));
+                }
             }
         }
         finally {

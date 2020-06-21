@@ -49,6 +49,10 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
             case "POST":
                 return addSend(input);
 
+            case "PUT":
+                logger.log("path: " + input.getPath());
+                return editSend(input);
+
             default:
                 return handleBadRequest();
         }
@@ -58,7 +62,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         try {
             var sends = sendProvider.getAllSends();
             var json = gson.toJson(sends);
-            return handleJsonSuccess(json);
+            return handleJsonSuccess(json, 200);
         }
         catch (SQLException e) {
             logger.log("Failed to get all sends. Database error occurred: " + e.getMessage());
@@ -75,26 +79,49 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
             var send = gson.fromJson(input.getBody(), Send.class);
             var id = sendProvider.addSend(send);
             var json = String.format("{\"id\": %s }", id);
-            return handleJsonSuccess(json);
+            return handleJsonSuccess(json, 201);
         }
         catch (SQLException e) {
             logger.log("Failed to add send. Database error occurred: " + e.getMessage());
             return handleInternalError();
         }
         catch (Exception e) {
-            logger.log("Failed to get add send. Something unexpected occurred: " + e.getMessage());
+            logger.log("Failed to add send. Something unexpected occurred: " + e.getMessage());
             return handleInternalError();
         }
     }
 
-    private APIGatewayProxyResponseEvent handleJsonSuccess(String json) {
+    private APIGatewayProxyResponseEvent editSend(final APIGatewayProxyRequestEvent input) {
+        try {
+            var send = gson.fromJson(input.getBody(), Send.class);
+            sendProvider.editSend(send);
+            return handleSuccess(204);
+        }
+        catch (SQLException e) {
+            logger.log("Failed to edit send. Database error occurred: " + e.getMessage());
+            return handleInternalError();
+        }
+        catch (Exception e) {
+            logger.log("Failed to edit send. Something unexpected occurred: " + e.getMessage());
+            return handleInternalError();
+        }
+    }
+
+    private APIGatewayProxyResponseEvent handleSuccess(int statusCode) {
+        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+        response.setIsBase64Encoded(false);
+        response.setStatusCode(statusCode);
+        return response;
+    }
+
+    private APIGatewayProxyResponseEvent handleJsonSuccess(String json, int status) {
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
         response.setIsBase64Encoded(false);
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         response.setHeaders(headers);
         response.setBody(json);
-        response.setStatusCode(200);
+        response.setStatusCode(status);
         return response;
     }
 

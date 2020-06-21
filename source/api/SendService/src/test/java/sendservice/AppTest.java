@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.junit.Test;
 import sendservice.models.Send;
 import sendservice.models.Style;
@@ -36,7 +35,7 @@ public class AppTest {
     String content = result.getBody();
 
     // assert
-    assertEquals((int) result.getStatusCode(), 200);
+    assertEquals(200, (int) result.getStatusCode());
     assertNotNull(content);
   }
 
@@ -55,7 +54,7 @@ public class AppTest {
     String content = result.getBody();
 
     // assert
-    assertEquals((int) result.getStatusCode(), 500);
+    assertEquals(500, (int) result.getStatusCode());
     assertNull(content);
   }
 
@@ -65,7 +64,6 @@ public class AppTest {
     SendProvider sendProvider = mock(PostgresSendProvider.class);
     var mockGeneratedId = 1;
     when(sendProvider.addSend(any())).thenReturn(mockGeneratedId);
-
 
     App app = new App(sendProvider);
     var event = new APIGatewayProxyRequestEvent();
@@ -80,7 +78,7 @@ public class AppTest {
     String content = result.getBody();
 
     // assert
-    assertEquals((int) result.getStatusCode(), 200);
+    assertEquals(201, (int) result.getStatusCode());
     assert(content.contains(Integer.toString(mockGeneratedId)));
   }
 
@@ -88,7 +86,6 @@ public class AppTest {
   public void postRequestFailure() throws Exception {
     // arrange
     SendProvider sendProvider = mock(PostgresSendProvider.class);
-    var mockGeneratedId = 1;
     when(sendProvider.addSend(any())).thenThrow(new SQLException());
 
     App app = new App(sendProvider);
@@ -103,7 +100,49 @@ public class AppTest {
     APIGatewayProxyResponseEvent result = app.handleRequest(event, context);
 
     // assert
-    assertEquals((int) result.getStatusCode(), 500);
+    assertEquals(500, (int) result.getStatusCode());
+  }
+
+  @Test
+  public void putRequestSuccess() throws Exception {
+    // arrange
+    SendProvider sendProvider = mock(PostgresSendProvider.class);
+    App app = new App(sendProvider);
+    var event = new APIGatewayProxyRequestEvent();
+    event.setHttpMethod("PUT");
+    var mockSend = new Send(-1, "name", Style.SPORT, "grade", TickType.REDPOINT, "location");
+    var mockBody = gson.toJson(mockSend);
+    event.setBody(mockBody);
+    var context = new TestContext();
+
+    // act
+    APIGatewayProxyResponseEvent result = app.handleRequest(event, context);
+    String content = result.getBody();
+
+    // assert
+    assertEquals(204, (int) result.getStatusCode());
+    assertNull(content);
+  }
+
+  @Test
+  public void putRequestFailure() throws Exception {
+    // arrange
+    SendProvider sendProvider = mock(PostgresSendProvider.class);
+    doThrow(new SQLException()).when(sendProvider).editSend(any());
+
+    App app = new App(sendProvider);
+    var event = new APIGatewayProxyRequestEvent();
+    event.setHttpMethod("PUT");
+    var mockSend = new Send(-1, "name", Style.SPORT, "grade", TickType.REDPOINT, "location");
+    var mockBody = gson.toJson(mockSend);
+    event.setBody(mockBody);
+    var context = new TestContext();
+
+    // act
+    APIGatewayProxyResponseEvent result = app.handleRequest(event, context);
+
+    // assert
+    assertEquals(500, (int) result.getStatusCode());
   }
 
   @Test
@@ -120,7 +159,7 @@ public class AppTest {
     String content = result.getBody();
 
     // assert
-    assertEquals((int) result.getStatusCode(), 400);
+    assertEquals(400, (int) result.getStatusCode());
     assertNull(content);
   }
 }
