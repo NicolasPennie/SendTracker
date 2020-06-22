@@ -13,6 +13,7 @@ import sendservice.models.TickType;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PostgresSendProvider implements SendProvider {
 
@@ -21,12 +22,8 @@ public class PostgresSendProvider implements SendProvider {
     private final SendDbCredentials dbCredentials;
     private final Gson gson = new Gson();
 
-    private interface DbResultHandler<T> {
-        T handleResult(ResultSet resultset) throws SQLException;
-    }
-
-    private interface DbStatementHandler {
-        void handleStatement(PreparedStatement statement) throws SQLException;
+    private interface ConnectionHandler {
+        void handleConnection(Connection connection) throws SQLException;
     }
 
     public PostgresSendProvider(LambdaLogger logger) throws ClassNotFoundException {
@@ -42,18 +39,26 @@ public class PostgresSendProvider implements SendProvider {
      * @throws SQLException
      */
     public List<Send> getAllSends() throws SQLException {
-        var query = "SELECT id, name, style, grade, tick_type, location FROM send";
+        var sql = "SELECT id, name, style, grade, tick_type, location FROM send";
+        var results = new ArrayList<Send>();
 
-        return executeDbQuery(query, resultSet -> {
-            var id = resultSet.getInt("id");
-            var name = resultSet.getString("name");
-            var style = Style.valueOf(resultSet.getString("style"));
-            var grade = resultSet.getString("grade");
-            var tickType = TickType.valueOf(resultSet.getString("tick_type"));
-            var location = resultSet.getString("location");
+        useDbConnection(connection -> {
+            var statement = connection.createStatement();
+            var resultSet = statement.executeQuery(sql);
 
-            return new Send(id, name, style, grade, tickType, location);
+            while (resultSet.next()) {
+                var id = resultSet.getInt("id");
+                var name = resultSet.getString("name");
+                var style = Style.valueOf(resultSet.getString("style"));
+                var grade = resultSet.getString("grade");
+                var tickType = TickType.valueOf(resultSet.getString("tick_type"));
+                var location = resultSet.getString("location");
+                var send = new Send(id, name, style, grade, tickType, location);
+                results.add(send);
+            }
         });
+
+        return results;
     }
 
     /**
@@ -63,39 +68,55 @@ public class PostgresSendProvider implements SendProvider {
      * @throws SQLException
      */
     public int addSend(Send send) throws SQLException {
+        AtomicInteger primaryKey = new AtomicInteger(-1);
         var sql = "INSERT INTO send (name, style, grade, tick_type, location) " +
                 "values (?, ?, ?, ?, ?) " +
                 "RETURNING id";
 
-        var results = executeDbUpdate(sql, statement -> {
+        useDbConnection(connection -> {
+            var statement = connection.prepareStatement(sql);
             statement.setString(1, send.getName());
             statement.setString(2, send.getStyle().toString());
             statement.setString(3, send.getGrade());
             statement.setString(4, send.getTickType().toString());
             statement.setString(5, send.getLocation());
-        }, resultSet -> resultSet.getInt(1));
+            statement.execute();
 
-        return results.get(0);
+            var resultSet = statement.getResultSet();
+            resultSet.next();
+            primaryKey.set(resultSet.getInt(1));
+        });
+
+        return primaryKey.get();
     }
 
     /**
      * Edits an existing send in the database.
-     * @param send Send to update. The ID field must be populated.
-     * @throws SQLException
+     * @param id ID of the existing send.
+     * @param send Send to update.
+     * @throws Exception
      */
-    public void editSend(Send send) throws SQLException {
+    public void editSend(int id, Send send) throws Exception {
+        AtomicInteger updateCount = new AtomicInteger(0);
         var sql = "UPDATE send " +
-                "SET (name, style, grade, tick_type, location) = (?, ?, ?, ?, ?)" +
+                "SET (name, style, grade, tick_type, location) = (?, ?, ?, ?, ?) " +
                 "WHERE id = ?";
 
-        executeDbUpdate(sql, statement -> {
+        useDbConnection(connection -> {
+            var statement = connection.prepareStatement(sql);
             statement.setString(1, send.getName());
             statement.setString(2, send.getStyle().toString());
             statement.setString(3, send.getGrade());
             statement.setString(4, send.getTickType().toString());
             statement.setString(5, send.getLocation());
-            statement.setInt(6, send.getId());
+            statement.setInt(6, id);
+            statement.execute();
+            updateCount.set(statement.getUpdateCount());
         });
+
+        if (updateCount.get() == 0) {
+            throw new Exception(String.format("No item with id %s exists.", id));
+        }
     }
 
     private String getConnectionString() {
@@ -125,97 +146,11 @@ public class PostgresSendProvider implements SendProvider {
         }
     }
 
-    /**
-     * Executes a query against the database.
-     * @param query SQL query.
-     * @param handler Function that processes the query results.
-     * @param <T> Model that the query results will be bound against.
-     * @return Query results as a list of T.
-     * @throws SQLException
-     */
-    private <T> List<T> executeDbQuery(String query, DbResultHandler<T> handler) throws SQLException {
-        var results = new ArrayList<T>();
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
 
-        try {
-            connection = DriverManager.getConnection(connectionString,
-                    dbCredentials.getUsername(), dbCredentials.getPassword());
-            connection.setAutoCommit(false);
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(query);
-
-            while (resultSet.next()) {
-                results.add(handler.handleResult(resultSet));
-            }
+    private void useDbConnection(ConnectionHandler handler) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(connectionString,
+                dbCredentials.getUsername(), dbCredentials.getPassword())) {
+            handler.handleConnection(connection);
         }
-        finally {
-            if (resultSet != null) {
-                resultSet.close();
-            }
-            if (statement != null) {
-                statement.close();
-            }
-            if (connection != null) {
-                connection.close();
-            }
-        }
-
-        return results;
-    }
-
-    /**
-     * Executes a SQL statement to update the database.
-     * @param sql Prepared SQL statement.
-     * @param statementHandler Handles the prepared SQL statement. Used to assign values to statement parameters.
-     * @throws SQLException
-     */
-    private void executeDbUpdate(String sql, DbStatementHandler statementHandler) throws SQLException {
-        executeDbUpdate(sql, statementHandler, null);
-    }
-
-    /**
-     * Executes a SQL statement to update the database.
-     * @param sql Prepared SQL statement.
-     * @param statementHandler Handles the prepared SQL statement. Used to assign values to statement parameters.
-     * @param resultHandler Handles the resultSet that contains the statement results.
-     * @return Update results as a list of T.
-     * @throws SQLException
-     */
-    private <T> List<T> executeDbUpdate(String sql, DbStatementHandler statementHandler, DbResultHandler<T> resultHandler)
-            throws SQLException {
-        var results = new ArrayList<T>();
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-
-        try {
-            connection = DriverManager.getConnection(connectionString,
-                    dbCredentials.getUsername(), dbCredentials.getPassword());
-            statement = connection.prepareStatement(sql);
-            statementHandler.handleStatement(statement);
-            statement.execute();
-
-            if (resultHandler != null) {
-                resultSet = statement.getResultSet();
-                while (resultSet.next()) {
-                    results.add(resultHandler.handleResult(resultSet));
-                }
-            }
-        }
-        finally {
-            if (resultSet != null) {
-                resultSet.close();
-            }
-            if (statement != null) {
-                statement.close();
-            }
-            if (connection != null) {
-                connection.close();
-            }
-        }
-
-        return results;
     }
 }

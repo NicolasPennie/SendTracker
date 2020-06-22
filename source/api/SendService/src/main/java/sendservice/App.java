@@ -50,7 +50,6 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
                 return addSend(input);
 
             case "PUT":
-                logger.log("path: " + input.getPath());
                 return editSend(input);
 
             default:
@@ -92,9 +91,22 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     }
 
     private APIGatewayProxyResponseEvent editSend(final APIGatewayProxyRequestEvent input) {
+        int id;
+        Send send;
+
         try {
-            var send = gson.fromJson(input.getBody(), Send.class);
-            sendProvider.editSend(send);
+            // Path is formatted as "/send/{id}"
+            var pathSegments = input.getPath().split("/");
+            id = Integer.parseInt(pathSegments[2]);
+            send = gson.fromJson(input.getBody(), Send.class);
+        }
+        catch (Exception e) {
+            logger.log("Failed to edit send. Invalid input was provided: " + e.getMessage());
+            return handleBadRequest();
+        }
+
+        try {
+            sendProvider.editSend(id, send);
             return handleSuccess(204);
         }
         catch (SQLException e) {

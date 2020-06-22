@@ -8,6 +8,14 @@ public class Send {
     private TickType tickType;
     private String location;
 
+    public Send(String name, Style style) {
+        this(-1, name, style, null, null, null);
+    }
+
+    public Send(String name, Style style, String grade, TickType tickType, String location) {
+        this(-1, name, style, grade, tickType, location);
+    }
+
     public Send(int id, String name, Style style, String grade, TickType tickType, String location) {
         this.id = id;
         this.name = name;

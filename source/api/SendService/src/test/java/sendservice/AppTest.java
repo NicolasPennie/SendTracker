@@ -68,7 +68,7 @@ public class AppTest {
     App app = new App(sendProvider);
     var event = new APIGatewayProxyRequestEvent();
     event.setHttpMethod("POST");
-    var mockSend = new Send(-1, "name", Style.SPORT, "grade", TickType.REDPOINT, "location");
+    var mockSend = new Send("name", Style.SPORT, "grade", TickType.REDPOINT, "location");
     var mockBody = gson.toJson(mockSend);
     event.setBody(mockBody);
     var context = new TestContext();
@@ -91,7 +91,7 @@ public class AppTest {
     App app = new App(sendProvider);
     var event = new APIGatewayProxyRequestEvent();
     event.setHttpMethod("POST");
-    var mockSend = new Send(-1, "name", Style.SPORT, "grade", TickType.REDPOINT, "location");
+    var mockSend = new Send("name", Style.SPORT, "grade", TickType.REDPOINT, "location");
     var mockBody = gson.toJson(mockSend);
     event.setBody(mockBody);
     var context = new TestContext();
@@ -105,14 +105,18 @@ public class AppTest {
 
   @Test
   public void putRequestSuccess() throws Exception {
-    // arrange
+    // mock
     SendProvider sendProvider = mock(PostgresSendProvider.class);
+    var mockSend = new Send("name", Style.SPORT, "grade", TickType.REDPOINT, "location");
+    var mockId = "15";
+    var mockBody = gson.toJson(mockSend);
+
+    // arrange
     App app = new App(sendProvider);
     var event = new APIGatewayProxyRequestEvent();
     event.setHttpMethod("PUT");
-    var mockSend = new Send(-1, "name", Style.SPORT, "grade", TickType.REDPOINT, "location");
-    var mockBody = gson.toJson(mockSend);
     event.setBody(mockBody);
+    event.setPath("/send/" + mockId);
     var context = new TestContext();
 
     // act
@@ -121,6 +125,7 @@ public class AppTest {
 
     // assert
     assertEquals(204, (int) result.getStatusCode());
+    verify(sendProvider, times(1)).editSend(eq(Integer.parseInt(mockId)), any());
     assertNull(content);
   }
 
@@ -128,12 +133,13 @@ public class AppTest {
   public void putRequestFailure() throws Exception {
     // arrange
     SendProvider sendProvider = mock(PostgresSendProvider.class);
-    doThrow(new SQLException()).when(sendProvider).editSend(any());
+    doThrow(new SQLException()).when(sendProvider).editSend(anyInt(), any());
 
     App app = new App(sendProvider);
     var event = new APIGatewayProxyRequestEvent();
     event.setHttpMethod("PUT");
-    var mockSend = new Send(-1, "name", Style.SPORT, "grade", TickType.REDPOINT, "location");
+    event.setPath("/send/14");
+    var mockSend = new Send("name", Style.SPORT, "grade", TickType.REDPOINT, "location");
     var mockBody = gson.toJson(mockSend);
     event.setBody(mockBody);
     var context = new TestContext();
