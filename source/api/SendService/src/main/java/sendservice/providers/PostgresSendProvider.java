@@ -119,6 +119,22 @@ public class PostgresSendProvider implements SendProvider {
         }
     }
 
+    public void deleteSend(int id) throws Exception {
+        AtomicInteger updateCount = new AtomicInteger(0);
+        var sql = "DELETE FROM send WHERE id = ?";
+
+        useDbConnection(connection -> {
+            var statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            statement.execute();
+            updateCount.set(statement.getUpdateCount());
+        });
+
+        if (updateCount.get() == 0) {
+            throw new Exception(String.format("No item with id %s exists.", id));
+        }
+    }
+
     private String getConnectionString() {
         String dbName = System.getenv("DB_NAME");
         String dbAddress = System.getenv("DB_ENDPOINT_ADDRESS");

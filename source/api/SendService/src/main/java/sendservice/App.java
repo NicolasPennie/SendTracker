@@ -52,6 +52,9 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
             case "PUT":
                 return editSend(input);
 
+            case "DELETE":
+                return deleteSend(input);
+
             default:
                 return handleBadRequest();
         }
@@ -115,6 +118,32 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         }
         catch (Exception e) {
             logger.log("Failed to edit send. Something unexpected occurred: " + e.getMessage());
+            return handleInternalError();
+        }
+    }
+
+    private APIGatewayProxyResponseEvent deleteSend(final APIGatewayProxyRequestEvent input) {
+        int id;
+        try {
+            // Path is formatted as "/send/{id}"
+            var pathSegments = input.getPath().split("/");
+            id = Integer.parseInt(pathSegments[2]);
+        }
+        catch (Exception e) {
+            logger.log("Failed to delete send. Invalid input was provided: " + e.getMessage());
+            return handleBadRequest();
+        }
+
+        try {
+            sendProvider.deleteSend(id);
+            return handleSuccess(204);
+        }
+        catch (SQLException e) {
+            logger.log("Failed to delete send. Database error occurred: " + e.getMessage());
+            return handleInternalError();
+        }
+        catch (Exception e) {
+            logger.log("Failed to delete send. Something unexpected occurred: " + e.getMessage());
             return handleInternalError();
         }
     }

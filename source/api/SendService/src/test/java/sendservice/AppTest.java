@@ -152,6 +152,48 @@ public class AppTest {
   }
 
   @Test
+  public void deleteRequestSuccess() throws Exception {
+    // mock
+    SendProvider sendProvider = mock(PostgresSendProvider.class);
+    var mockId = "15";
+
+    // arrange
+    App app = new App(sendProvider);
+    var event = new APIGatewayProxyRequestEvent();
+    event.setHttpMethod("DELETE");
+    event.setPath("/send/" + mockId);
+    var context = new TestContext();
+
+    // act
+    APIGatewayProxyResponseEvent result = app.handleRequest(event, context);
+    String content = result.getBody();
+
+    // assert
+    assertEquals(204, (int) result.getStatusCode());
+    verify(sendProvider, times(1)).deleteSend(eq(Integer.parseInt(mockId)));
+    assertNull(content);
+  }
+
+  @Test
+  public void deleteRequestFailure() throws Exception {
+    // arrange
+    SendProvider sendProvider = mock(PostgresSendProvider.class);
+    doThrow(new SQLException()).when(sendProvider).deleteSend(anyInt());
+
+    App app = new App(sendProvider);
+    var event = new APIGatewayProxyRequestEvent();
+    event.setHttpMethod("DELETE");
+    event.setPath("/send/14");
+    var context = new TestContext();
+
+    // act
+    APIGatewayProxyResponseEvent result = app.handleRequest(event, context);
+
+    // assert
+    assertEquals(500, (int) result.getStatusCode());
+  }
+
+  @Test
   public void unexpectedRequest() {
     // arrange
     SendProvider sendProvider = mock(PostgresSendProvider.class);

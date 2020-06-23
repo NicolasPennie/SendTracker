@@ -10,4 +10,6 @@ public interface SendProvider {
     int addSend(Send send) throws Exception;
 
     void editSend(int id, Send send) throws Exception;
+
+    void deleteSend(int id) throws  Exception;
 }
