@@ -15,6 +15,7 @@ import sendservice.providers.SendProvider;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 public class AppTest {
   private Gson gson = new Gson();
@@ -23,7 +24,7 @@ public class AppTest {
   public void getRequestSuccess() throws Exception {
     // arrange
     SendProvider sendProvider = mock(PostgresSendProvider.class);
-    var mockSend = new Send(1, "name", Style.SPORT, "grade", TickType.REDPOINT, "location");
+    var mockSend = new Send(UUID.randomUUID(), "name", Style.SPORT, "grade", TickType.REDPOINT, "location");
     when(sendProvider.getAllSends()).thenReturn(List.of(mockSend));
     App app = new App(sendProvider);
     var event = new APIGatewayProxyRequestEvent();
@@ -62,7 +63,7 @@ public class AppTest {
   public void postRequestSuccess() throws Exception {
     // arrange
     SendProvider sendProvider = mock(PostgresSendProvider.class);
-    var mockGeneratedId = 1;
+    var mockGeneratedId = UUID.randomUUID();
     when(sendProvider.addSend(any())).thenReturn(mockGeneratedId);
 
     App app = new App(sendProvider);
@@ -79,7 +80,7 @@ public class AppTest {
 
     // assert
     assertEquals(201, (int) result.getStatusCode());
-    assert(content.contains(Integer.toString(mockGeneratedId)));
+    assert(content.contains(mockGeneratedId.toString()));
   }
 
   @Test
@@ -108,7 +109,7 @@ public class AppTest {
     // mock
     SendProvider sendProvider = mock(PostgresSendProvider.class);
     var mockSend = new Send("name", Style.SPORT, "grade", TickType.REDPOINT, "location");
-    var mockId = "15";
+    var mockId = UUID.randomUUID();
     var mockBody = gson.toJson(mockSend);
 
     // arrange
@@ -116,7 +117,7 @@ public class AppTest {
     var event = new APIGatewayProxyRequestEvent();
     event.setHttpMethod("PUT");
     event.setBody(mockBody);
-    event.setPath("/send/" + mockId);
+    event.setPath("/send/" + mockId.toString());
     var context = new TestContext();
 
     // act
@@ -125,7 +126,7 @@ public class AppTest {
 
     // assert
     assertEquals(204, (int) result.getStatusCode());
-    verify(sendProvider, times(1)).editSend(eq(Integer.parseInt(mockId)), any());
+    verify(sendProvider, times(1)).editSend(eq(mockId), any());
     assertNull(content);
   }
 
@@ -133,12 +134,12 @@ public class AppTest {
   public void putRequestFailure() throws Exception {
     // arrange
     SendProvider sendProvider = mock(PostgresSendProvider.class);
-    doThrow(new SQLException()).when(sendProvider).editSend(anyInt(), any());
+    doThrow(new SQLException()).when(sendProvider).editSend(any(), any());
 
     App app = new App(sendProvider);
     var event = new APIGatewayProxyRequestEvent();
     event.setHttpMethod("PUT");
-    event.setPath("/send/14");
+    event.setPath("/send/" + UUID.randomUUID());
     var mockSend = new Send("name", Style.SPORT, "grade", TickType.REDPOINT, "location");
     var mockBody = gson.toJson(mockSend);
     event.setBody(mockBody);
@@ -155,13 +156,13 @@ public class AppTest {
   public void deleteRequestSuccess() throws Exception {
     // mock
     SendProvider sendProvider = mock(PostgresSendProvider.class);
-    var mockId = "15";
+    var mockId = UUID.randomUUID();
 
     // arrange
     App app = new App(sendProvider);
     var event = new APIGatewayProxyRequestEvent();
     event.setHttpMethod("DELETE");
-    event.setPath("/send/" + mockId);
+    event.setPath("/send/" + mockId.toString());
     var context = new TestContext();
 
     // act
@@ -170,7 +171,7 @@ public class AppTest {
 
     // assert
     assertEquals(204, (int) result.getStatusCode());
-    verify(sendProvider, times(1)).deleteSend(eq(Integer.parseInt(mockId)));
+    verify(sendProvider, times(1)).deleteSend(eq(mockId));
     assertNull(content);
   }
 
@@ -178,12 +179,12 @@ public class AppTest {
   public void deleteRequestFailure() throws Exception {
     // arrange
     SendProvider sendProvider = mock(PostgresSendProvider.class);
-    doThrow(new SQLException()).when(sendProvider).deleteSend(anyInt());
+    doThrow(new SQLException()).when(sendProvider).deleteSend(any());
 
     App app = new App(sendProvider);
     var event = new APIGatewayProxyRequestEvent();
     event.setHttpMethod("DELETE");
-    event.setPath("/send/14");
+    event.setPath("/send/" + UUID.randomUUID());
     var context = new TestContext();
 
     // act

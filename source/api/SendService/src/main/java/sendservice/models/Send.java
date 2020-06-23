@@ -1,7 +1,9 @@
 package sendservice.models;
 
+import java.util.UUID;
+
 public class Send {
-    private int id;
+    private UUID id;
     private String name;
     private Style style;
     private String grade;
@@ -9,14 +11,14 @@ public class Send {
     private String location;
 
     public Send(String name, Style style) {
-        this(-1, name, style, null, null, null);
+        this(null, name, style, null, null, null);
     }
 
     public Send(String name, Style style, String grade, TickType tickType, String location) {
-        this(-1, name, style, grade, tickType, location);
+        this(null, name, style, grade, tickType, location);
     }
 
-    public Send(int id, String name, Style style, String grade, TickType tickType, String location) {
+    public Send(UUID id, String name, Style style, String grade, TickType tickType, String location) {
         this.id = id;
         this.name = name;
         this.style = style;
@@ -25,11 +27,11 @@ public class Send {
         this.location = location;
     }
 
-    public int getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

@@ -13,7 +13,9 @@ import sendservice.models.TickType;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PostgresSendProvider implements SendProvider {
 
@@ -47,7 +49,7 @@ public class PostgresSendProvider implements SendProvider {
             var resultSet = statement.executeQuery(sql);
 
             while (resultSet.next()) {
-                var id = resultSet.getInt("id");
+                var id = UUID.fromString(resultSet.getString("id"));
                 var name = resultSet.getString("name");
                 var style = Style.valueOf(resultSet.getString("style"));
                 var grade = resultSet.getString("grade");
@@ -67,8 +69,8 @@ public class PostgresSendProvider implements SendProvider {
      * @return Generated ID.
      * @throws SQLException
      */
-    public int addSend(Send send) throws SQLException {
-        AtomicInteger primaryKey = new AtomicInteger(-1);
+    public UUID addSend(Send send) throws SQLException {
+        AtomicReference<String> primaryKey = new AtomicReference<>();
         var sql = "INSERT INTO send (name, style, grade, tick_type, location) " +
                 "values (?, ?, ?, ?, ?) " +
                 "RETURNING id";
@@ -84,10 +86,10 @@ public class PostgresSendProvider implements SendProvider {
 
             var resultSet = statement.getResultSet();
             resultSet.next();
-            primaryKey.set(resultSet.getInt(1));
+            primaryKey.set(resultSet.getString(1));
         });
 
-        return primaryKey.get();
+        return UUID.fromString(primaryKey.get());
     }
 
     /**
@@ -96,7 +98,7 @@ public class PostgresSendProvider implements SendProvider {
      * @param send Send to update.
      * @throws Exception
      */
-    public void editSend(int id, Send send) throws Exception {
+    public void editSend(UUID id, Send send) throws Exception {
         AtomicInteger updateCount = new AtomicInteger(0);
         var sql = "UPDATE send " +
                 "SET (name, style, grade, tick_type, location) = (?, ?, ?, ?, ?) " +
@@ -109,7 +111,7 @@ public class PostgresSendProvider implements SendProvider {
             statement.setString(3, send.getGrade());
             statement.setString(4, send.getTickType().toString());
             statement.setString(5, send.getLocation());
-            statement.setInt(6, id);
+            statement.setObject(6, id);
             statement.execute();
             updateCount.set(statement.getUpdateCount());
         });
@@ -119,13 +121,13 @@ public class PostgresSendProvider implements SendProvider {
         }
     }
 
-    public void deleteSend(int id) throws Exception {
+    public void deleteSend(UUID id) throws Exception {
         AtomicInteger updateCount = new AtomicInteger(0);
         var sql = "DELETE FROM send WHERE id = ?";
 
         useDbConnection(connection -> {
             var statement = connection.prepareStatement(sql);
-            statement.setInt(1, id);
+            statement.setObject(1, id);
             statement.execute();
             updateCount.set(statement.getUpdateCount());
         });

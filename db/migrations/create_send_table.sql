@@ -1,5 +1,6 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE send(
-  id          SERIAL PRIMARY KEY,
+  id          uuid DEFAULT uuid_generate_v4(),
   name        varchar(100) NOT NULL,
   style       varchar(100),
   grade       varchar(100),

@@ -2,6 +2,7 @@ package sendservice;
 
 import java.sql.*;
 import java.util.HashMap;
+import java.util.UUID;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
@@ -80,7 +81,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         try {
             var send = gson.fromJson(input.getBody(), Send.class);
             var id = sendProvider.addSend(send);
-            var json = String.format("{\"id\": %s }", id);
+            var json = String.format("{\"id\": \"%s\" }", id.toString());
             return handleJsonSuccess(json, 201);
         }
         catch (SQLException e) {
@@ -94,13 +95,13 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     }
 
     private APIGatewayProxyResponseEvent editSend(final APIGatewayProxyRequestEvent input) {
-        int id;
+        UUID id;
         Send send;
 
         try {
             // Path is formatted as "/send/{id}"
             var pathSegments = input.getPath().split("/");
-            id = Integer.parseInt(pathSegments[2]);
+            id = UUID.fromString(pathSegments[2]);
             send = gson.fromJson(input.getBody(), Send.class);
         }
         catch (Exception e) {
@@ -123,11 +124,11 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     }
 
     private APIGatewayProxyResponseEvent deleteSend(final APIGatewayProxyRequestEvent input) {
-        int id;
+        UUID id;
         try {
             // Path is formatted as "/send/{id}"
             var pathSegments = input.getPath().split("/");
-            id = Integer.parseInt(pathSegments[2]);
+            id = UUID.fromString(pathSegments[2]);
         }
         catch (Exception e) {
             logger.log("Failed to delete send. Invalid input was provided: " + e.getMessage());
